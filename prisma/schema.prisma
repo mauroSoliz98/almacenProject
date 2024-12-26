@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-py"
+  enable_experimental_decimal = true
+}
+
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model departure_product {
+  id_departure Int
+  order        Int
+  id_product   Int
+  quantity     Int
+  unit_price   Decimal   @db.Decimal(10,2)
+  departures   Departure @relation(fields: [id_departure], references: [id])
+  products     Product   @relation(fields: [id_product], references: [id])
+
+  @@id([id_departure, order])
+}
+
+model Departure {
+  id                Int                 @id @default(autoincrement())
+  create_at         DateTime            @db.Timestamp(6) @default(now())
+  destiny           String
+  departure_product departure_product[]
+  
+  @@map("departures")
+}
+
+model Entry {
+  id             BigInt           @id @default(autoincrement())
+  create_at      DateTime         @db.Timestamp(6) @default(now())
+  id_supplier    BigInt
+  supplier       Supplier         @relation(fields: [id_supplier], references: [id])
+  entry_product  entry_product[]
+  @@map("entries")
+}
+
+model entry_product {
+  id_entry   BigInt
+  order      Int
+  id_product Int
+  quantity   Int
+  unit_price Decimal @db.Decimal(10,2)
+  entries    Entry  @relation(fields: [id_entry], references: [id])
+  products   Product @relation(fields: [id_product], references: [id])
+
+  @@id([id_entry, order])
+}
+
+model Product {
+  id                Int                @id(map: "pruducts_pkey") @default(autoincrement())
+  name              String             @db.VarChar(50)
+  brand             String             @db.VarChar(50)
+  description       String?
+  units             String
+  unit_price        Decimal              @db.Decimal(10,2)
+  departure_product departure_product[]
+  entry_product     entry_product[]
+  @@map("products")
+}
+
+model Supplier {
+  id             BigInt           @id(map: "supplier_pkey") @default(autoincrement())
+  supplier_name  String?          @db.VarChar(50)
+  phone_number   Int?
+  mail           String?
+  location       String?
+  entry          Entry[]
+  @@map("suppliers")
+}
