@@ -8,6 +8,6 @@ class Product(BaseModel):
   unit_price: float
   units: str
 
-class ProductReference(BaseModel):
+class Product_Reference(BaseModel):
   
   id: int

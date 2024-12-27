@@ -46,7 +46,7 @@ async def delete_item(supplier_id: int):
     return data
 
 #Actualizar un elemento
-@supplierRouter.put("/{item_id}")
+@supplierRouter.put("/{supplier_id}")
 async def update_item(supplier_id: int, updatedSupplier: Supplier):
   await db.connect()
   data = await db.supplier.update(where={'id': supplier_id}, data = updatedSupplier.model_dump())

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, status
 from prisma import Prisma
 from src.models.entry_model import Entry, Entry_product
-from src.models.supplier_model import SupplierReference
-from src.models.product_model import ProductReference
+from src.models.supplier_model import Supplier_reference
+from src.models.product_model import Product_Reference
 db = Prisma()
 entryRoute = APIRouter()
 
@@ -23,14 +23,14 @@ async def get_todo(id: int):
     return data
 
 @entryRoute.post("/", status_code=status.HTTP_201_CREATED)
-async def create_todo(entry: Entry, supplier: SupplierReference, product: ProductReference, entry_product: Entry_product):
+async def create_todo(entry: Entry, supplier: Supplier_reference, product: Product_Reference, entry_product: Entry_product):
 
   await db.connect()
 
   new_entry = await db.entry.create(
     data= 
       {
-        "id_supplier": supplier.id_supplier,
+        "id_supplier": supplier.id,
         "create_at": entry.create_at,
         "entry_product": {
             "create": [

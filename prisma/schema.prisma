@@ -12,7 +12,7 @@ datasource db {
 
 model departure_product {
   id_departure Int
-  order        Int
+  order        Int    @default(autoincrement())
   id_product   Int
   quantity     Int
   unit_price   Decimal   @db.Decimal(10,2)
@@ -42,7 +42,7 @@ model Entry {
 
 model entry_product {
   id_entry   BigInt
-  order      Int
+  order      Int    @default(autoincrement())
   id_product Int
   quantity   Int
   unit_price Decimal @db.Decimal(10,2)
