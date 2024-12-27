@@ -1,8 +1,9 @@
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from src.routers.item_router import itemRouter
+from src.routers.product_router import itemRouter
 from src.routers.departure_router import departureRoute
 from src.routers.entry_router import entryRoute
+from src.routers.supplier_router import supplierRouter
 
 app = FastAPI()
 
@@ -27,8 +28,10 @@ def read_root():
     return {"Hello": "World"}
 
 
-app.include_router(prefix="/api/items", router=itemRouter)
+app.include_router(prefix="/api/products", router=itemRouter)
 
 app.include_router(prefix="/api/departure", router=departureRoute)
 
 app.include_router(prefix="/api/entry", router=entryRoute)
+
+app.include_router(prefix="/api/suppliers", router=supplierRouter)
