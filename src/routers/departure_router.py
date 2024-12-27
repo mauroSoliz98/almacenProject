@@ -27,7 +27,7 @@ async def create_todo(departure: Departure, product: ProductReference, departure
   await db.connect()
   #Agregamos el nuevo item al stock
   new_departure = await db.departure.create(
-    data= 
+    data = 
       {
         "destiny": departure.destiny,
         "create_at": departure.create_at,
