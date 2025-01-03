@@ -16,15 +16,15 @@ async def get_items():
 
 #Se encarga de mostrar un elemento en concreto
 @itemRouter.get("/{item_id}")
-async def get_item(item_id:int):
-  await db.connect()
-  try:
-    item = await db.product.find_many(where={'id':item_id})
-    if item:
-      return item
-    raise HTTPException(status_code=404, detail='item not found :c')
-  finally:
-    await db.disconnect()
+async def get_item(item_id: int):
+    await db.connect()
+    try:
+        item = await db.product.find_unique(where={'id': item_id})
+        if item:
+            return item  # Devuelve el objeto directamente
+        raise HTTPException(status_code=404, detail='product not found')
+    finally:
+        await db.disconnect()
   
 
 #Añade un nuevo elemnento
