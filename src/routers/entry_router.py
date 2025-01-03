@@ -17,7 +17,7 @@ async def get_todos():
 @entryRoute.get("/{id}")
 async def get_todo(id: int):
     await db.connect()
-    data = await db.entry.find_many(where={'id':id} )
+    data = await db.entry.find_unique(where={'id':id} )
     await db.disconnect()
 
     return data

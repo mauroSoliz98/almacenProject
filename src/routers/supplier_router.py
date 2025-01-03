@@ -19,7 +19,7 @@ async def get_items():
 async def get_item(supplier_id:int):
   await db.connect()
   try:
-    supplier = await db.supplier.find_many(where={'id':supplier_id})
+    supplier = await db.supplier.find_unique(where={'id':supplier_id})
     if supplier:
       return supplier
     raise HTTPException(status_code=404, detail='item not found :c')

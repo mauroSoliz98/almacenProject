@@ -16,7 +16,7 @@ async def get_todos():
 @departureRoute.get("/{id}")
 async def get_todo(id: int):
     await db.connect()
-    data = await db.departure.find_many(where={'id':id} )
+    data = await db.departure.find_unique(where={'id':id} )
     await db.disconnect()
     #data = supabase.table("Departure").select("*").eq("id", id).execute()
     return data
