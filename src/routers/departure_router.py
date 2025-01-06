@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, HTTPException
 from prisma import Prisma
 from src.models.departure_model import Departure, Departure_product
 from src.models.product_model import Product_Reference
@@ -8,10 +8,35 @@ departureRoute = APIRouter()
 @departureRoute.get("/")
 async def get_todos():
     await db.connect()
-    data = await db.departure.find_many()
-    await db.disconnect()
-    #data = supabase.table("Departure").select('*').execute()
-    return data
+    try:
+        # Recupera datos de departure_product incluyendo relaciones
+        data = await db.departure_product.find_many(include={
+            'departures': True,
+            'products': True
+        })
+
+        # Filtra los datos para excluir los IDs
+        filtered_data = [
+            {               
+                'departure': {
+                    'id': item.departures.id,
+                    'create_at': item.departures.create_at,
+                    'destiny': item.departures.destiny
+                } if item.departures else None,
+                'product': {
+                    'name': item.products.name,
+                } if item.products else None,
+                'quantity': item.quantity,
+                'unit_price': item.unit_price
+            }
+            for item in data
+        ]
+        print(filtered_data)
+        return filtered_data
+    finally:
+        await db.disconnect()
+
+
 
 @departureRoute.get("/{id}")
 async def get_todo(id: int):
@@ -20,6 +45,8 @@ async def get_todo(id: int):
     await db.disconnect()
     #data = supabase.table("Departure").select("*").eq("id", id).execute()
     return data
+
+
 
 @departureRoute.post("/", status_code=status.HTTP_201_CREATED)
 async def create_todo(departure: Departure, product: Product_Reference, departure_product: Departure_product):
@@ -42,7 +69,7 @@ async def create_todo(departure: Departure, product: Product_Reference, departur
         }
       },   
     )
-
+  
   await db.disconnect()
   return new_departure
     #data = supabase.table('Departure').insert(todo.dict(Departure)).execute()
