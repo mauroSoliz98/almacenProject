@@ -26,6 +26,7 @@ async def get_todos():
                 'product': {
                     'name': item.products.name,
                 } if item.products else None,
+                'order':item.order,
                 'quantity': item.quantity,
                 'unit_price': item.unit_price
             }
