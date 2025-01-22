@@ -44,7 +44,6 @@ async def get_todo(id: int):
     await db.connect()
     data = await db.departure.find_unique(where={'id':id} )
     await db.disconnect()
-    #data = supabase.table("Departure").select("*").eq("id", id).execute()
     return data
 
 
@@ -73,13 +72,10 @@ async def create_todo(departure: Departure, product: Product_Reference, departur
   
   await db.disconnect()
   return new_departure
-    #data = supabase.table('Departure').insert(todo.dict(Departure)).execute()
 
 @departureRoute.delete("/{id}", status_code=status.HTTP_200_OK)
 async def delete_todo(id: int):
-    #data = supabase.table('Departure').delete().eq('id', id).execute()
     await db.connect()
-    #del stock[item_id]
     data = await db.departure.delete(where={"id": id})
     await db.disconnect()
     return data
