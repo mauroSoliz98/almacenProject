@@ -1,12 +1,14 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from src.routers.product_router import itemRouter
 from src.routers.departure_router import departureRoute
 from src.routers.entry_router import entryRoute
 from src.routers.supplier_router import supplierRouter
 
 app = FastAPI()
-
 
 origins = ["http://localhost:5173"]
 
@@ -17,21 +19,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-# MUCHO OJO: AL PARECER EL ENPOINT UTILIZA LOS ATRIBUTO DEL BASE MODEL Y NO LOS DE
-# LA BD POR LO QUE LOS ATRIBUTOS DEL BASE MODEL TIENES QUE SER IGUALES A LOS DE LA
-# BD
 
+# Configura Jinja2Templates para apuntar al directorio dist
+templates = Jinja2Templates(directory="../backend/dist")
 
-# Ruta raiz
-@app.get("/")
+# Monta el directorio dist para servir archivos estáticos
+app.mount('/assets', StaticFiles(directory="../backend/dist/assets"), name='assets')
+
 def read_root():
-    return {"Hello": "World"}
+    with open("dist/index.html", "r") as file:
+        return HTMLResponse(content=file.read(), media_type="text/html")
 
 
+# Incluye los routers
 app.include_router(prefix="/api/products", router=itemRouter)
-
 app.include_router(prefix="/api/departure", router=departureRoute)
-
 app.include_router(prefix="/api/entry", router=entryRoute)
-
 app.include_router(prefix="/api/suppliers", router=supplierRouter)
