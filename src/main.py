@@ -24,7 +24,7 @@ app.add_middleware(
 templates = Jinja2Templates(directory="../dist")
 
 # Monta el directorio dist para servir archivos estáticos
-app.mount('/assets', StaticFiles(directory="../dist/assets"), name='assets')
+app.mount('/assets', StaticFiles(directory="dist/assets"), name='assets')
 
 @app.get("/")
 def read_root():
