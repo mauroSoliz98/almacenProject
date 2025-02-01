@@ -21,10 +21,10 @@ app.add_middleware(
 )
 
 # Configura Jinja2Templates para apuntar al directorio dist
-templates = Jinja2Templates(directory="../backend/dist")
+templates = Jinja2Templates(directory="../dist")
 
 # Monta el directorio dist para servir archivos estáticos
-app.mount('/assets', StaticFiles(directory="../backend/dist/assets"), name='assets')
+app.mount('/assets', StaticFiles(directory="../dist/assets"), name='assets')
 
 @app.get("/")
 def read_root():
@@ -37,3 +37,9 @@ app.include_router(prefix="/api/products", router=itemRouter)
 app.include_router(prefix="/api/departure", router=departureRoute)
 app.include_router(prefix="/api/entry", router=entryRoute)
 app.include_router(prefix="/api/suppliers", router=supplierRouter)
+
+'''
+NOTA: 
+PONER ESTE COMANDO EN START COMMAND DE RENDER
+uvicorn src.main:app --host 0.0.0.0 --port $PORT
+'''
