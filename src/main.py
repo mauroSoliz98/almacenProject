@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, status, Request
+import os
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -27,9 +28,17 @@ templates = Jinja2Templates(directory="../dist")
 app.mount('/assets', StaticFiles(directory="dist/assets"), name='assets')
 
 @app.get("/")
-def read_root():
-    with open("dist/index.html", "r") as file:
-        return HTMLResponse(content=file.read(), media_type="text/html")
+async def serve_react():
+    return HTMLResponse(open("dist/index.html").read())
+
+@app.get("/{full_path:path}")
+async def serve_react_app(full_path: str):
+    """Sirve index.html para cualquier ruta desconocida, permitiendo que React maneje el enrutamiento."""
+    if not full_path.startswith("api"):  # No sobrescribir las rutas de la API
+        index_path = "dist/index.html"
+        if os.path.exists(index_path):
+            return HTMLResponse(open(index_path).read())
+    raise HTTPException(status_code=404, detail="Not Found")
 
 
 # Incluye los routers
