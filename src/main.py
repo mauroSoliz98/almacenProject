@@ -1,7 +1,6 @@
-import os
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from src.routers.product_router import itemRouter
@@ -9,7 +8,7 @@ from src.routers.departure_router import departureRoute
 from src.routers.entry_router import entryRoute
 from src.routers.supplier_router import supplierRouter
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None)
 
 origins = ["http://localhost:5173"]
 
@@ -27,28 +26,18 @@ templates = Jinja2Templates(directory="../dist")
 # Monta el directorio dist para servir archivos estáticos
 app.mount('/assets', StaticFiles(directory="dist/assets"), name='assets')
 
+
+# Incluye los routers
+app.include_router(itemRouter, prefix="/api/products")
+app.include_router(departureRoute, prefix="/api/departure")
+app.include_router(entryRoute, prefix="/api/entry")
+app.include_router(supplierRouter, prefix="/api/suppliers")
+
+
 @app.get("/")
 async def serve_react():
     return HTMLResponse(open("dist/index.html").read())
 
-@app.get("/{full_path:path}")
-async def serve_react_app(full_path: str):
-    """Sirve index.html para cualquier ruta desconocida, permitiendo que React maneje el enrutamiento."""
-    if not full_path.startswith("api"):  # No sobrescribir las rutas de la API
-        index_path = "dist/index.html"
-        if os.path.exists(index_path):
-            return HTMLResponse(open(index_path).read())
-    raise HTTPException(status_code=404, detail="Not Found")
-
-
-# Incluye los routers
-app.include_router(prefix="/api/products", router=itemRouter)
-app.include_router(prefix="/api/departure", router=departureRoute)
-app.include_router(prefix="/api/entry", router=entryRoute)
-app.include_router(prefix="/api/suppliers", router=supplierRouter)
-
-'''
-NOTA: 
-PONER ESTE COMANDO EN START COMMAND DE RENDER
-uvicorn src.main:app --host 0.0.0.0 --port $PORT
-'''
+@app.exception_handler(404)
+async def exception_404_handler(request, exc):
+    return FileResponse("dist/index.html")
