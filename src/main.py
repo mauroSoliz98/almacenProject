@@ -26,6 +26,7 @@ templates = Jinja2Templates(directory="../backend/dist")
 # Monta el directorio dist para servir archivos estáticos
 app.mount('/assets', StaticFiles(directory="../backend/dist/assets"), name='assets')
 
+@app.get("/")
 def read_root():
     with open("dist/index.html", "r") as file:
         return HTMLResponse(content=file.read(), media_type="text/html")
