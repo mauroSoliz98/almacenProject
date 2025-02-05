@@ -41,3 +41,7 @@ async def serve_react():
 @app.exception_handler(404)
 async def exception_404_handler(request, exc):
     return FileResponse("dist/index.html")
+'''
+NOTA: PONER EL SIGUEINTE COMANDO EN RENDER
+prisma && uvicorn main:app --host 0.0.0.0 --port $PORT
+'''
