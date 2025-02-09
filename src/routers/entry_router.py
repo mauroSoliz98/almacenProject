@@ -9,10 +9,28 @@ entryRoute = APIRouter()
 @entryRoute.get("/")
 async def get_todos():
     await db.connect()
-    data = await db.entry.find_many()
-    await db.disconnect()
+    try:
+      data = await db.entry.find_many(
+        include={"supplier": True, "entry_product": {"include": {"products": True}}}
+      )
+      filter_data = [
+        {
+          "id": item.id,
+          "supplier": {item.supplier.supplier_name},
+          "entry_product": [
+            {
+              "product":product.products.name,
+              "quantity": product.quantity,
+              "unit_price": product.unit_price,
+            } for product in item.entry_product
+          ],
+        "create_at": item.create_at, 
+        } for item in data
+      ]
+    finally:
+      await db.disconnect()
 
-    return data
+    return filter_data
 
 @entryRoute.get("/{id}")
 async def get_todo(id: int):
