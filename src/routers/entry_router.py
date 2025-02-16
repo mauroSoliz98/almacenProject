@@ -3,6 +3,8 @@ from prisma import Prisma
 from src.models.entry_model import Entry, Entry_product
 from src.models.supplier_model import Supplier_reference
 from src.models.product_model import Product_Reference
+from typing import List
+
 db = Prisma()
 entryRoute = APIRouter()
 
@@ -41,7 +43,7 @@ async def get_todo(id: int):
     return data
 
 @entryRoute.post("/", status_code=status.HTTP_201_CREATED)
-async def create_todo(entry: Entry, supplier: Supplier_reference, product: Product_Reference, entry_product: Entry_product):
+async def create_todo(entry: Entry, supplier: Supplier_reference, products: List[Product_Reference], entry_products: List[Entry_product]):
 
   await db.connect()
 
@@ -57,6 +59,7 @@ async def create_todo(entry: Entry, supplier: Supplier_reference, product: Produ
                     "quantity": entry_product.quantity,
                     "unit_price": entry_product.unit_price,
                 }
+                for product, entry_product in zip(products, entry_products)
             ]
         }
       },   
