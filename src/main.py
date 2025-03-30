@@ -8,6 +8,7 @@ from src.routers.departure_router import departureRoute
 from src.routers.entry_router import entryRoute
 from src.routers.supplier_router import supplierRouter
 from src.routers.auth_router import authRouter
+from src.middleware.auth_middleware import AuthMiddleware
 import sys
 import os
 
@@ -16,6 +17,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 app = FastAPI(docs_url=None, redoc_url=None)
 
 origins = ["http://localhost:5173"]
+
+app.add_middleware(AuthMiddleware)
 
 app.add_middleware(
     CORSMiddleware,

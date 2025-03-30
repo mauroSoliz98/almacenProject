@@ -1,5 +1,5 @@
 from prisma import Prisma
-from fastapi import APIRouter,HTTPException
+from fastapi import APIRouter,HTTPException, Header
 from config import supabase
 from src.models.user_model import User
 
@@ -33,3 +33,17 @@ async def get_me(token: str):
         raise HTTPException(status_code=401, detail="Token inválido o expirado")
 
     return {"user": user}
+
+@authRouter.post("/logout")
+async def logout(authorization: str = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Token no proporcionado")
+
+    # Supabase NO usa el token aquí, pero el frontend sí lo necesita para eliminarlo
+    response = supabase.auth.sign_out()
+
+    if response and response.get("error"):
+        raise HTTPException(status_code=400, detail="Error al cerrar sesión")
+
+
+    return {"message": "Sesión cerrada con éxito"}
