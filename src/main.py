@@ -7,6 +7,7 @@ from src.routers.product_router import itemRouter
 from src.routers.departure_router import departureRoute
 from src.routers.entry_router import entryRoute
 from src.routers.supplier_router import supplierRouter
+from src.routers.auth_router import authRoute
 
 app = FastAPI(docs_url=None, redoc_url=None)
 
@@ -32,6 +33,7 @@ app.include_router(itemRouter, prefix="/api/products")
 app.include_router(departureRoute, prefix="/api/departure")
 app.include_router(entryRoute, prefix="/api/entry")
 app.include_router(supplierRouter, prefix="/api/suppliers")
+app.include_router(authRoute, prefix="/api/auth")
 
 
 @app.get("/")
