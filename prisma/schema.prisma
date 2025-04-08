@@ -37,49 +37,49 @@ model Profile {
 
 model departure_product {
   id_departure Int
+  order        Int    @default(autoincrement())
   id_product   Int
-  order        Int
   quantity     Int
-  unit_price   Decimal    @db.Decimal(10, 2)
+  unit_price   Decimal   @db.Decimal(10,2)
   departures   Departure @relation(fields: [id_departure], references: [id])
   products     Product   @relation(fields: [id_product], references: [id])
 
-  @@id([id_departure, order])
   @@schema("public")
+  @@id([id_departure, order])
 }
 
 model Departure {
   id                Int                 @id @default(autoincrement())
+  create_at         DateTime            @db.Timestamp(6) @default(now())
   destiny           String
-  create_at         DateTime            @default(now()) @db.Timestamp(6)
   departure_product departure_product[]
-
+  
   @@schema("public")
   @@map("departures")
 }
 
 model Entry {
-  id            BigInt          @id @default(autoincrement())
-  id_supplier   BigInt
-  create_at     DateTime        @default(now()) @db.Timestamp(6)
-  suppliers     Supplier       @relation(fields: [id_supplier], references: [id])
-  entry_product entry_product[]
-
+  id             BigInt           @id @default(autoincrement())
+  create_at      DateTime         @db.Timestamp(6) @default(now())
+  id_supplier    BigInt
+  supplier       Supplier         @relation(fields: [id_supplier], references: [id])
+  entry_product  entry_product[]
+  
   @@schema("public")
   @@map("entries")
 }
 
 model entry_product {
   id_entry   BigInt
+  order      Int    @default(autoincrement())
   id_product Int
-  order      Int
   quantity   Int
-  unit_price Decimal  @db.Decimal(10, 2)
+  unit_price Decimal @db.Decimal(10,2)
   entries    Entry  @relation(fields: [id_entry], references: [id])
   products   Product @relation(fields: [id_product], references: [id])
 
-  @@id([id_entry, order])
   @@schema("public")
+  @@id([id_entry, order])
 }
 
 model Product {
@@ -91,7 +91,7 @@ model Product {
   unit_price        Decimal              @db.Decimal(10,2)
   departure_product departure_product[]
   entry_product     entry_product[]
-
+  
   @@schema("public")
   @@map("products")
 }
@@ -103,7 +103,7 @@ model Supplier {
   mail           String?
   location       String?
   entry          Entry[]
-
+  
   @@schema("public")
   @@map("suppliers")
 }
