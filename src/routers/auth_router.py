@@ -1,10 +1,11 @@
 from typing import List
 from fastapi import APIRouter, status, HTTPException, Depends
 from prisma import Prisma
-from src.models.user_model import User
 from src.models.register_model import RegisterUserResponse, RegisterUserRequest
+from src.models.login_model import LoginUserRequest
 import httpx
 import os
+import bcrypt
 
 authRoute = APIRouter()
 
@@ -83,29 +84,59 @@ async def register_user(
         user_id=user_id,
         profile=profile
     )
+#LA PARTE QUE NOS INTERESA EN ESTE MOMENTO ES LA DE LOGIN
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    # Ejemplo con bcrypt; asegúrate de que esté instalado e importado correctamente.
+    return bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
 
 @authRoute.post("/login")
 async def login_user(
-    user: User,
+    data: LoginUserRequest,   # Usamos el modelo exclusivo para login
     db: Prisma = Depends(get_db)
 ):
     try:
-        existing_user = await db.user.find_first(
+        # Buscar el perfil por username e incluir el usuario relacionado para acceder a la contraseña encriptada.
+        profile = await db.profile.find_first(
             where={
-                "email": user.email,
-                "password": user.password,
+                "username": data.username
+            },
+            include={
+                "user": True  # Esto se encarga de traer los datos del usuario relacionado (incluyendo encrypted_password)
             }
         )
-        if not existing_user:
+        
+        if not profile:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Credenciales inválidas"
             )
         
+        # Verificar la contraseña
+        user = profile.user
+        if not user or not user.encrypted_password:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciales inválidas"
+            )
+        
+        if not verify_password(data.password, user.encrypted_password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciales inválidas"
+            )
+        
+        # Si todo es correcto, se puede devolver un token o los datos del usuario.
         return {
             "message": "Inicio de sesión exitoso",
-            "user": existing_user
+            "user": {
+                "id": user.id,
+                "username": profile.username,
+                "email": profile.email  # O cualquier otro dato que quieras enviar
+            }
         }
+    except HTTPException as http_err:
+        # Re-lanzar los HTTPException ya definidos
+        raise http_err
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
