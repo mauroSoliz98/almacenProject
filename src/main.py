@@ -11,7 +11,7 @@ from src.routers.auth_router import authRoute
 
 app = FastAPI(docs_url=None, redoc_url=None)
 
-origins = ["http://localhost:5173"]
+origins = ["http://localhost:5173", "https://almacenproject-zu5h.onrender.com"]
 
 app.add_middleware(
     CORSMiddleware,
